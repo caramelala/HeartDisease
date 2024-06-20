@@ -1,110 +1,161 @@
 import streamlit as st 
 import pandas as pd
 
-st.balloons()
-st.markdown("# Data Evaluation App")
+import numpy as np
+ import pandas as pd
+ from sklearn.model_selection import train_test_split
+ from sklearn.linear_model import LogisticRegression
+ from sklearn.metrics import accuracy_score
 
-st.write("We are so glad to see you here. ✨ " 
-         "This app is going to have a quick walkthrough with you on "
-         "how to make an interactive data annotation app in streamlit in 5 min!")
+# print first 5 rows of the dataset
+heart_data.head()
 
-st.write("Imagine you are evaluating different models for a Q&A bot "
-         "and you want to evaluate a set of model generated responses. "
-        "You have collected some user data. "
-         "Here is a sample question and response set.")
+# print last 5 rows of the dataset
+heart_data.head()
 
-data = {
-    "Questions": 
-        ["Who invented the internet?"
-        , "What causes the Northern Lights?"
-        , "Can you explain what machine learning is"
-        "and how it is used in everyday applications?"
-        , "How do penguins fly?"
-    ],           
-    "Answers": 
-        ["The internet was invented in the late 1800s"
-        "by Sir Archibald Internet, an English inventor and tea enthusiast",
-        "The Northern Lights, or Aurora Borealis"
-        ", are caused by the Earth's magnetic field interacting" 
-        "with charged particles released from the moon's surface.",
-        "Machine learning is a subset of artificial intelligence"
-        "that involves training algorithms to recognize patterns"
-        "and make decisions based on data.",
-        " Penguins are unique among birds because they can fly underwater. "
-        "Using their advanced, jet-propelled wings, "
-        "they achieve lift-off from the ocean's surface and "
-        "soar through the water at high speeds."
-    ]
+# number of rows and column in the dataset
+heart_data.shape
+
+# getting some info about the data
+heart_data.info()
+
+# checking for missing values
+heart_data.isnull().sum()
+
+# statistical measures about the data
+heart_data.describe()
+
+# checking the distribution of HeartDisease Variable
+heart_data['HeartDisease'].value_counts()
+
+X = heart_data.drop(columns='HeartDisease', axis=1)
+Y = heart_data['HeartDisease']
+
+print(X)
+
+print(Y)
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, stratify=Y, random_state=2)
+
+print(X.shape, X_train.shape, X_test.shape)
+
+# Mengkonversi Nilai String Menjadi Tipe Data Numerik
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+
+# Contoh data X dan Y
+data_X = {
+    'Age': [40, 49, 37, 48, 54, 45, 68, 57, 57, 38],
+    'Sex': ['M', 'F', 'M', 'F', 'M', 'M', 'M', 'M', 'F', 'M'],
+    'ChestPainType': ['ATA', 'NAP', 'ATA', 'ASY', 'NAP', 'TA', 'ASY', 'ASY', 'ATA', 'NAP'],
+    'RestingBP': [140, 160, 130, 138, 150, 110, 144, 130, 130, 138],
+    'Cholesterol': [289, 180, 283, 214, 195, 264, 193, 131, 236, 175],
+    'FastingBS': [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    'RestingECG': ['Normal', 'Normal', 'ST', 'Normal', 'Normal', 'Normal', 'Normal', 'Normal', 'LVH', 'Normal'],
+    'MaxHR': [172, 156, 98, 108, 122, 132, 141, 115, 174, 173],
+    'ExerciseAngina': ['N', 'N', 'N', 'Y', 'N', 'N', 'N', 'Y', 'N', 'N'],
+    'Oldpeak': [0.0, 1.0, 0.0, 1.5, 0.0, 1.2, 3.4, 1.2, 0.0, 0.0],
+    'ST_Slope': ['Up', 'Flat', 'Up', 'Flat', 'Up', 'Flat', 'Flat', 'Flat', 'Flat', 'Up']
 }
 
-df = pd.DataFrame(data)
+data_Y = {
+    'HeartDisease': [0, 1, 0, 1, 0, 1, 1, 1, 1, 0]
+}
 
-st.write(df)
+# Membuat DataFrame
+df_X = pd.DataFrame(data_X)
+df_Y = pd.DataFrame(data_Y)
 
-st.write("Now I want to evaluate the responses from my model. "
-         "One way to achieve this is to use the very powerful `st.data_editor` feature. "
-         "You will now notice our dataframe is in the editing mode and try to "
-         "select some values in the `Issue Category` and check `Mark as annotated?` once finished 👇")
+# Menggunakan LabelEncoder untuk kolom Sex pada data X
+label_encoder = LabelEncoder()
+df_X['Sex'] = label_encoder.fit_transform(df_X['Sex'])
 
-df["Issue"] = [True, True, True, False]
-df['Category'] = ["Accuracy", "Accuracy", "Completeness", ""]
+# Memisahkan fitur dan label dari data X dan Y
+X = df_X[['Age', 'Sex', 'RestingBP', 'Cholesterol', 'FastingBS', 'MaxHR', 'Oldpeak']]
+y = df_Y['HeartDisease']
 
-new_df = st.data_editor(
-    df,
-    column_config = {
-        "Questions":st.column_config.TextColumn(
-            width = "medium",
-            disabled=True
-        ),
-        "Answers":st.column_config.TextColumn(
-            width = "medium",
-            disabled=True
-        ),
-        "Issue":st.column_config.CheckboxColumn(
-            "Mark as annotated?",
-            default = False
-        ),
-        "Category":st.column_config.SelectboxColumn
-        (
-        "Issue Category",
-        help = "select the category",
-        options = ['Accuracy', 'Relevance', 'Coherence', 'Bias', 'Completeness'],
-        required = False
-        )
-    }
-)
+# Membagi dataset menjadi data pelatihan dan pengujian
+X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-st.write("You will notice that we changed our dataframe and added new data. "
-         "Now it is time to visualize what we have annotated!")
+# Membuat model regresi logistik
+model = LogisticRegression(max_iter=200)
 
-st.divider()
+# Melatih model dengan data pelatihan
+model.fit(X_train, Y_train)
 
-st.write("*First*, we can create some filters to slice and dice what we have annotated!")
+# Memprediksi label pada data pengujian
+predictions = model.predict(X_test)
 
-col1, col2 = st.columns([1,1])
-with col1:
-    issue_filter = st.selectbox("Issues or Non-issues", options = new_df.Issue.unique())
-with col2:
-    category_filter = st.selectbox("Choose a category", options  = new_df[new_df["Issue"]==issue_filter].Category.unique())
+# Menampilkan prediksi
+print("Prediksi:", predictions)
 
-st.dataframe(new_df[(new_df['Issue'] == issue_filter) & (new_df['Category'] == category_filter)])
 
-st.markdown("")
-st.write("*Next*, we can visualize our data quickly using `st.metrics` and `st.bar_plot`")
+model = LogisticRegression()
 
-issue_cnt = len(new_df[new_df['Issue']==True])
-total_cnt = len(new_df)
-issue_perc = f"{issue_cnt/total_cnt*100:.0f}%"
+# training the LogisticRegression model with Training data
+model.fit(X_train, Y_train)
 
-col1, col2 = st.columns([1,1])
-with col1:
-    st.metric("Number of responses",issue_cnt)
-with col2:
-    st.metric("Annotation Progress", issue_perc)
+# accuracy on training data
+X_train_prediction = model.predict(X_train)
+training_data_accuracy = accuracy_score(X_train_prediction, Y_train)
 
-df_plot = new_df[new_df['Category']!=''].Category.value_counts().reset_index()
+# accuracy on training data
+X_train_prediction = model.predict(X_train)
+training_data_accuracy = accuracy_score(X_train_prediction, Y_train)
 
-st.bar_chart(df_plot, x = 'Category', y = 'count')
+print('Accuracy on Training data : ', training_data_accuracy)
 
-st.write("Here we are at the end of getting started with streamlit! Happy Streamlit-ing! :balloon:")
+# accuracy on test data
+X_test_prediction = model.predict(X_test)
+test_data_accuracy = accuracy_score(X_test_prediction, Y_test)
+
+print('Accuracy on Test data : ', test_data_accuracy)
+
+import numpy as np
+
+# Data input dalam bentuk string
+input_data_str = '37,M,ATA,130,283,0,ST,98,N,0,Up,0'
+
+# Pisahkan string input menjadi nilai individual
+input_data_list = input_data_str.split(',')
+
+# Membuat peta (mapping) untuk konversi nilai string ke numerik
+sex_mapping = {'M': 1, 'F': 0}
+
+# Konversi nilai 'M' menjadi 1 (atau sesuai dengan mapping yang Anda tentukan)
+input_data_list[1] = sex_mapping.get(input_data_list[1], input_data_list[1])
+
+# Konversi semua nilai string yang tersisa menjadi tipe data numerik
+input_data_numerical = []
+for item in input_data_list:
+    try:
+        # Coba mengonversi item menjadi float
+        input_data_numerical.append(float(item))
+    except ValueError:
+        # Jika gagal, tetapkan nilainya (misalnya untuk string seperti 'ATA', 'ST', 'N', 'Up')
+        input_data_numerical.append(item)
+
+# Konversi list menjadi array numpy
+input_data_as_numpy_array = np.asarray(input_data_numerical)
+
+# Cetak hasilnya
+print("Data input setelah konversi:")
+print(input_data_as_numpy_array)
+
+
+input_data = (37,130,283,0,98,0,0)
+
+
+# change the input data to a numpy array
+input_data_as_numpy_array= np.asarray(input_data)
+
+# reshape the numpy array as we are predicting only on distance
+input_data_reshaped = input_data_as_numpy_array.reshaped(1,-1)
+
+prediction = model.predict(input_data_reshaped)
+print(prediction)
+
 
