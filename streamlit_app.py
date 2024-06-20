@@ -8,6 +8,8 @@ from sklearn.metrics import accuracy_score
 import sklearn
 print(sklearn.__version__)
 
+# loading the csv data to a Pandas DataFrame
+heart_data = pd.read_csv('/content/heart.csv')
 
 # print first 5 rows of the dataset
 heart_data.head()
