@@ -146,16 +146,6 @@ print("Data input setelah konversi:")
 print(input_data_as_numpy_array)
 
 
-input_data = (37,130,283,0,98,0,0)
 
-
-# change the input data to a numpy array
-input_data_as_numpy_array= np.asarray(input_data)
-
-# reshape the numpy array as we are predicting only on distance
-input_data_reshaped = input_data_as_numpy_array.reshaped(1,-1)
-
-prediction = model.predict(input_data_reshaped)
-print(prediction)
 
 
